@@ -4,10 +4,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\ProductController;
 
 // Endpoint test sederhana
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('items', ItemController::class);
+Route::apiResource('brands', BrandController::class);
+Route::apiResource('products', ProductController::class);
 Route::get('/test', function () {
     
     return response()->json([
