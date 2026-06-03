@@ -3,24 +3,42 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemController; 
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AuthController;
 
-// Endpoint test sederhana
-Route::apiResource('categories', CategoryController::class);
-Route::apiResource('items', ItemController::class);
-Route::apiResource('brands', BrandController::class);
-Route::apiResource('products', ProductController::class);
-Route::get('/test', function () {
-    
-    return response()->json([
-        'status' => 'success',
-        'message' => 'API endpoint berhasil diakses',
-        'data' => [
-            'nama' => 'Bayu Alamsyah Pabarani',
-            'nim' => '60200124099',
-            'matkul' => 'Environment dan Repository'
-        ]
-    ], 200);
+Route::prefix('v1')->group(function () {
+
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('login', [AuthController::class, 'login']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+
+
+        Route::apiResource('categories', CategoryController::class)->except(['destroy']);
+        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->middleware('role:admin');
+
+
+        Route::apiResource('items', ItemController::class)->except(['destroy']);
+        Route::delete('items/{item}', [ItemController::class, 'destroy'])->middleware('role:admin');
+
+
+        Route::apiResource('brands', BrandController::class);
+        Route::apiResource('products', ProductController::class);
+    });
+
+
+    Route::get('/test', function () {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'API endpoint berhasil diakses',
+            'data' => [
+                'nama' => 'Bayu Alamsyah Pabarani',
+                'nim' => '60200124099',
+                'matkul' => 'Environment dan Repository'
+            ]
+        ], 200);
+    });
+
 });
