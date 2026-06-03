@@ -7,33 +7,75 @@ use Illuminate\Http\Request;
 
 class ItemController extends Controller
 {
+    // Mengambil semua data
     public function index()
     {
-        return response()->json(Item::with('category')->get());
+        return response()->json([
+            'status' => 'success',
+            'data' => Item::all()
+        ]);
     }
 
+    // Menyimpan data baru
     public function store(Request $request)
     {
-        $item = Item::create($request->all());
-        return response()->json($item, 201);
+        $data = $request->validate([
+            'name' => 'required',
+            'quantity' => 'required|integer',
+            'price' => 'required|numeric',
+            'category_id' => 'required|integer'
+        ]);
+
+        $item = Item::create($data);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Item berhasil dibuat',
+            'data' => $item
+        ], 201);
     }
 
+    // Menampilkan detail satu data
     public function show($id)
     {
-        $item = Item::with('category')->findOrFail($id);
-        return response()->json($item);
+        $item = Item::findOrFail($id);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $item
+        ]);
     }
 
+    // Mengupdate data
     public function update(Request $request, $id)
     {
         $item = Item::findOrFail($id);
-        $item->update($request->all());
-        return response()->json($item);
+
+        $data = $request->validate([
+            'name' => 'sometimes|string',
+            'quantity' => 'sometimes|integer',
+            'price' => 'sometimes|numeric',
+            'category_id' => 'sometimes|integer'
+        ]);
+
+        $item->update($data);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Item berhasil diupdate',
+            'data' => $item
+        ]);
     }
 
+    // Menghapus data
     public function destroy($id)
     {
-        Item::destroy($id);
-        return response()->json(null, 204);
+        $item = Item::findOrFail($id);
+        $item->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Item berhasil dihapus'
+        ]);
     }
 }
