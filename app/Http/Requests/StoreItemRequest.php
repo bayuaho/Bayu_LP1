@@ -13,6 +13,24 @@ class StoreItemRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation()
+    {
+        $input = $this->all();
+
+        array_walk($input, function (&$value) {
+
+            if (is_string($value)) {
+
+                $value = trim(
+                    strip_tags($value)
+                );
+
+            }
+        });
+
+        $this->merge($input);
+    }
+
     public function rules(): array
     {
         return [

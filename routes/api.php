@@ -15,30 +15,21 @@ Route::prefix('v1')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
 
+        Route::apiResource('categories', CategoryController::class)
+            ->except(['destroy']);
 
-        Route::apiResource('categories', CategoryController::class)->except(['destroy']);
-        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->middleware('role:admin');
+        Route::delete(
+            'categories/{category}',
+            [CategoryController::class, 'destroy']
+        )->middleware('role:admin');
 
+        Route::apiResource('items', ItemController::class)
+            ->except(['destroy']);
 
-        Route::apiResource('items', ItemController::class)->except(['destroy']);
-        Route::delete('items/{item}', [ItemController::class, 'destroy'])->middleware('role:admin');
-
-
-        Route::apiResource('brands', BrandController::class);
-        Route::apiResource('products', ProductController::class);
-    });
-
-
-    Route::get('/test', function () {
-        return response()->json([
-            'status' => 'success',
-            'message' => 'API endpoint berhasil diakses',
-            'data' => [
-                'nama' => 'Bayu Alamsyah Pabarani',
-                'nim' => '60200124099',
-                'matkul' => 'Environment dan Repository'
-            ]
-        ], 200);
+        Route::delete(
+            'items/{item}',
+            [ItemController::class, 'destroy']
+        )->middleware('role:admin');
     });
 
 });

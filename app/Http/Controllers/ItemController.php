@@ -2,80 +2,90 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\BaseController;
 use App\Models\Item;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreItemRequest;
+use App\Http\Requests\UpdateItemRequest;
 
-class ItemController extends Controller
+class ItemController extends BaseController
 {
-    // Mengambil semua data
     public function index()
     {
-        return response()->json([
-            'status' => 'success',
-            'data' => Item::all()
-        ]);
+        return $this->success(
+            Item::all(),
+            'Data item berhasil diambil'
+        );
     }
 
-    // Menyimpan data baru
-    public function store(Request $request)
+    public function store(StoreItemRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-            'category_id' => 'required|integer'
-        ]);
+        $item = Item::create(
+            $request->validated()
+        );
 
-        $item = Item::create($data);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Item berhasil dibuat',
-            'data' => $item
-        ], 201);
+        return $this->success(
+            $item,
+            'Item berhasil dibuat',
+            201
+        );
     }
 
-    // Menampilkan detail satu data
     public function show($id)
     {
-        $item = Item::findOrFail($id);
+        $item = Item::find($id);
 
-        return response()->json([
-            'status' => 'success',
-            'data' => $item
-        ]);
+        if (!$item) {
+            return $this->error(
+                'Item tidak ditemukan',
+                404
+            );
+        }
+
+        return $this->success(
+            $item,
+            'Detail item berhasil diambil'
+        );
     }
 
-    // Mengupdate data
-    public function update(Request $request, $id)
+    public function update(UpdateItemRequest $request, $id)
     {
-        $item = Item::findOrFail($id);
+        $item = Item::find($id);
 
-        $data = $request->validate([
-            'name' => 'sometimes|string',
-            'quantity' => 'sometimes|integer',
-            'price' => 'sometimes|numeric',
-            'category_id' => 'sometimes|integer'
-        ]);
+        if (!$item) {
 
-        $item->update($data);
+            return $this->error(
+                'Item tidak ditemukan',
+                404
+            );
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Item berhasil diupdate',
-            'data' => $item
-        ]);
+        }
+
+        $item->update(
+            $request->validated()
+        );
+
+        return $this->success(
+            $item,
+            'Item berhasil diupdate'
+        );
     }
 
-    // Menghapus data
     public function destroy($id)
     {
-        $item = Item::findOrFail($id);
+        $item = Item::find($id);
+
+        if (!$item) {
+            return $this->error(
+                'Item tidak ditemukan',
+                404
+            );
+        }
+
         $item->delete();
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Item berhasil dihapus'
-        ]);
+        return $this->success(
+            null,
+            'Item berhasil dihapus'
+        );
     }
 }

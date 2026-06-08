@@ -1,26 +1,25 @@
 # Inventory System API v1
-Base URL: `http://localhost:8000/api/v1`
-## Auth
-POST /register
-Body: { name, email, password, password_confirmation }
-Response: 201 Created {
-"status":"success",
-"data": { "user":..., "token":... },
-"message":"User registered"
-}
-POST /login
-Body: { email, password }
-...
-## Categories
-GET /categories
 
-POST /categories { name }
+Base URL:
+http://localhost:8000/api/v1
+
+## Auth
+
+POST /register
+POST /login
+
+## Categories
+
+GET /categories
+POST /categories
 GET /categories/{id}
-PUT /categories/{id} { name }
-DELETE /categories/{id} (admin only)
+PUT /categories/{id}
+DELETE /categories/{id}
+
 ## Items
+
 GET /items
-POST /items { name, quantity, price, category_id }
+POST /items
 GET /items/{id}
 PUT /items/{id}
-DELETE /items/{id} (admin only)
+DELETE /items/{id}
