@@ -6,13 +6,25 @@ use App\Http\Controllers\Api\BaseController;
 use App\Models\Item;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
+use Illuminate\Http\Request;
 
 class ItemController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = Item::query();
+
+        if ($request->filled('category_id')) {
+
+            $query->where(
+                'category_id',
+                $request->category_id
+            );
+
+        }
+
         return $this->success(
-            Item::all(),
+            $query->get(),
             'Data item berhasil diambil'
         );
     }
