@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\BaseController;
-use App\Models\Item;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
+use App\Models\Item;
 use Illuminate\Http\Request;
+
 
 class ItemController extends BaseController
 {
@@ -15,12 +16,13 @@ class ItemController extends BaseController
         $query = Item::query();
 
         if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
 
-            $query->where(
-                'category_id',
-                $request->category_id
-            );
+        if ($request->filled('search')) {
+            $keyword = trim($request->search);
 
+            $query->where('name', 'like', '%' . $keyword . '%');
         }
 
         return $this->success(
@@ -31,9 +33,7 @@ class ItemController extends BaseController
 
     public function store(StoreItemRequest $request)
     {
-        $item = Item::create(
-            $request->validated()
-        );
+        $item = Item::create($request->validated());
 
         return $this->success(
             $item,
@@ -64,21 +64,17 @@ class ItemController extends BaseController
         $item = Item::find($id);
 
         if (!$item) {
-
             return $this->error(
-                'Item tidak ditemukan',
+                'Item tidak dapat ditemukan',
                 404
             );
-
         }
 
-        $item->update(
-            $request->validated()
-        );
+        $item->update($request->validated());
 
         return $this->success(
             $item,
-            'Item berhasil diupdate'
+            'Item sudah berhasil diupdate'
         );
     }
 
