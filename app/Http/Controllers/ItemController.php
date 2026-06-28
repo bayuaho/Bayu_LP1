@@ -3,20 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Api\BaseController;
-use App\Models\Item;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
+use App\Services\ItemService;
 use Illuminate\Http\Request;
 
 class ItemController extends BaseController
 {
+    protected $itemService;
+
+    public function __construct(ItemService $itemService)
+    {
+        $this->itemService = $itemService;
+    }
+
     public function index(Request $request)
     {
-        $query = Item::query();
+        $items = $this->itemService->all();
 
         if ($request->filled('category_id')) {
 
-            $query->where(
+            $items = $items->where(
                 'category_id',
                 $request->category_id
             );
@@ -24,14 +31,14 @@ class ItemController extends BaseController
         }
 
         return $this->success(
-            $query->get(),
+            $items->values(),
             'Data item berhasil diambil'
         );
     }
 
     public function store(StoreItemRequest $request)
     {
-        $item = Item::create(
+        $item = $this->itemService->create(
             $request->validated()
         );
 
@@ -44,14 +51,7 @@ class ItemController extends BaseController
 
     public function show($id)
     {
-        $item = Item::find($id);
-
-        if (!$item) {
-            return $this->error(
-                'Item tidak ditemukan',
-                404
-            );
-        }
+        $item = $this->itemService->find($id);
 
         return $this->success(
             $item,
@@ -61,18 +61,8 @@ class ItemController extends BaseController
 
     public function update(UpdateItemRequest $request, $id)
     {
-        $item = Item::find($id);
-
-        if (!$item) {
-
-            return $this->error(
-                'Item tidak ditemukan',
-                404
-            );
-
-        }
-
-        $item->update(
+        $item = $this->itemService->update(
+            $id,
             $request->validated()
         );
 
@@ -84,16 +74,7 @@ class ItemController extends BaseController
 
     public function destroy($id)
     {
-        $item = Item::find($id);
-
-        if (!$item) {
-            return $this->error(
-                'Item tidak ditemukan',
-                404
-            );
-        }
-
-        $item->delete();
+        $this->itemService->delete($id);
 
         return $this->success(
             null,
